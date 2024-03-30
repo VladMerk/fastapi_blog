@@ -13,6 +13,10 @@ sqlalchemy = "^2.0.29"
 alembic = "^1.13.1"
 pydantic-settings = "^2.2.1"
 aiosqlite = "^0.20.0"
+pydantic = {extras = ["email"], version = "^2.6.4"}
+bcrypt = "^4.1.2"
+passlib = "^1.7.4"
+types-passlib = "^1.7.7.20240327"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -28,11 +32,11 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.black]
-line-length = 120
+line-length = 100
 
 [tool.flake8]
 max-line-length = 100
-extend-ignore = "W291 E128 E122"
+extend-ignore = "W291 E128 E122 F401"
 
 [tool.pytest.ini_options]
 addopts = "-sv -p no:cacheprovider"
