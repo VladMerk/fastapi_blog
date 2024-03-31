@@ -1,23 +1,16 @@
-from typing import Sequence
-from fastapi import APIRouter, Depends, Form, Request
-from sqlalchemy import Result, select
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from schemas.user import UserCreate, ShowUser
 from db.models.users import User
+from db.repository.user import db_user
 from db.session import session_dependency
-from db.repository.user import create_new_user
-
+from fastapi import APIRouter, Depends, Form
+from schemas.user import ShowUser, UserCreate
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/api/v1/users", tags=["Users"])
 
 
 @router.get("/", response_model=list[ShowUser])
-async def get_users(
-    session: AsyncSession = Depends(session_dependency),
-) -> list[ShowUser]:
-    result: Result = await session.execute(select(User))
-    users: Sequence[User] = result.scalars().all()
+async def get_users(session: AsyncSession = Depends(session_dependency)) -> list[ShowUser]:
+    users: list[User] = await db_user.get_all(session=session)
     return [ShowUser.model_validate(user) for user in users]
 
 
@@ -28,5 +21,13 @@ async def create_user(
     session: AsyncSession = Depends(session_dependency),
 ) -> ShowUser:
     user_in = UserCreate(email=email, password=password)
-    user: User = await create_new_user(user_in, session)
+    user: User = await db_user.create(user_in, session)
+    return ShowUser.model_validate(user)
+
+
+@router.delete("/{user_id}")
+async def remove_user(
+    user_id: int, session: AsyncSession = Depends(session_dependency)
+) -> ShowUser:
+    user: User = await db_user.remove(user_id, session)
     return ShowUser.model_validate(user)

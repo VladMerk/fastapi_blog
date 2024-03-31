@@ -1,7 +1,7 @@
-from fastapi import FastAPI
 from apis.v1 import route_users
 from apps.v1 import route_blog
 from core.config import settings
+from fastapi import FastAPI
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
